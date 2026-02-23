@@ -1,0 +1,37 @@
+{
+  "assignment_id": "excel_101",
+  "assignment_type": "excel",
+  "version": "1.0",
+  "checks": [
+    {
+      "id": "sheet_summary_exists",
+      "type": "sheet_exists",
+      "config": {
+        "sheet": "Summary"
+      },
+      "marks": 2,
+      "section": "Structure"
+    },
+    {
+      "id": "column_price_exists",
+      "type": "column_exists",
+      "config": {
+        "sheet": "Dataset",
+        "column": "Price"
+      },
+      "marks": 2,
+      "section": "Structure"
+    },
+    {
+      "id": "total_price_uses_sum",
+      "type": "cell_formula_contains",
+      "config": {
+        "sheet": "Summary",
+        "cell": "B2",
+        "must_contain": "SUM"
+      },
+      "marks": 3,
+      "section": "Calculations"
+    }
+  ]
+}
