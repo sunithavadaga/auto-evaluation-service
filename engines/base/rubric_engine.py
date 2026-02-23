@@ -12,26 +12,17 @@ class RubricEngine:
 
         for result in self.rule_results:
             section = result["section"]
-            marks_awarded = result["marks"]
+            marks_awarded = result["marks_awarded"]
+            max_marks = result["max_marks"]
 
-            # Calculate section score
             if section not in section_scores:
                 section_scores[section] = 0
 
             section_scores[section] += marks_awarded
-
             total_score += marks_awarded
-
-        # Calculate maximum possible marks
-        for result in self.rule_results:
-            max_score += result.get("max_marks", result["marks"] if result["passed"] else result.get("max_marks", 0))
-
-        # If max_marks not provided, assume sum of all marks
-        if max_score == 0:
-            max_score = sum(r["marks"] for r in self.rule_results)
+            max_score += max_marks
 
         percentage = (total_score / max_score) * 100 if max_score > 0 else 0
-
         pass_status = percentage >= self.passing_percentage
 
         return {

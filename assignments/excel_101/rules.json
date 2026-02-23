@@ -1,37 +1,48 @@
 {
   "assignment_id": "excel_101",
   "assignment_type": "excel",
-  "version": "1.0",
+  "version": "2.0",
   "checks": [
+
     {
       "id": "sheet_summary_exists",
+      "category": "structure",
       "type": "sheet_exists",
       "config": {
-        "sheet": "Summary"
+        "sheet_name": "sheet"
       },
       "marks": 2,
       "section": "Structure"
     },
+
     {
-      "id": "column_price_exists",
-      "type": "column_exists",
+      "id": "total_sum_formula",
+      "category": "calculation",
+      "type": "cell_formula_validation",
       "config": {
-        "sheet": "Dataset",
-        "column": "Price"
-      },
-      "marks": 2,
-      "section": "Structure"
-    },
-    {
-      "id": "total_price_uses_sum",
-      "type": "cell_formula_contains",
-      "config": {
-        "sheet": "Summary",
+        "sheet": "sheet",
         "cell": "B2",
-        "must_contain": "SUM"
+        "required_functions": ["SUM"],
+        "reject_hardcoded": true
       },
       "marks": 3,
       "section": "Calculations"
+    },
+
+    {
+      "id": "price_range_if",
+      "category": "calculation",
+      "type": "column_formula_validation",
+      "config": {
+        "sheet": "sheet",
+        "column_letter": "F",
+        "start_row": 2,
+        "required_functions": ["IF"],
+        "reject_hardcoded": true
+      },
+      "marks": 5,
+      "section": "Logical Functions"
     }
+
   ]
 }

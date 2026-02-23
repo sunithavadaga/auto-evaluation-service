@@ -10,42 +10,90 @@ class RuleExecutor:
         for check in checks:
 
             passed = False
+            rule_type = check["type"]
+            config = check["config"]
 
-            if check["type"] == "sheet_exists":
-                sheet_name = check["config"]["sheet"]
+            # -----------------------------
+            # 1️⃣ Sheet Exists
+            # -----------------------------
+            if rule_type == "sheet_exists":
+                sheet_name = config.get("sheet") or config.get("sheet_name")
                 passed = sheet_name in self.workbook.sheetnames
 
-            elif check["type"] == "column_exists":
-                sheet_name = check["config"]["sheet"]
-                column_name = check["config"]["column"]
-
-                if sheet_name in self.workbook.sheetnames:
-                    sheet = self.workbook[sheet_name]
-                    headers = [cell.value for cell in sheet[1]]
-                    passed = column_name in headers
-
-            # 🔥 NEW FORMULA RULE
-            elif check["type"] == "cell_formula_contains":
-                sheet_name = check["config"]["sheet"]
-                cell_address = check["config"]["cell"]
-                must_contain = check["config"]["must_contain"]
+            # -----------------------------
+            # 2️⃣ Cell Formula Validation
+            # -----------------------------
+            elif rule_type == "cell_formula_validation":
+                sheet_name = config["sheet"]
+                cell_address = config["cell"]
+                required_functions = config.get("required_functions", [])
+                reject_hardcoded = config.get("reject_hardcoded", False)
 
                 if sheet_name in self.workbook.sheetnames:
                     sheet = self.workbook[sheet_name]
                     cell_value = sheet[cell_address].value
 
-                    if isinstance(cell_value, str):
-                        passed = must_contain.upper() in cell_value.upper()
+                    if isinstance(cell_value, str) and cell_value.startswith("="):
+
+                        formula_upper = cell_value.upper()
+
+                        # Check required functions
+                        functions_ok = all(
+                            func.upper() in formula_upper
+                            for func in required_functions
+                        )
+
+                        # Reject hardcoded values
+                        if reject_hardcoded:
+                            passed = functions_ok
+                        else:
+                            passed = True
                     else:
                         passed = False
+
+            # -----------------------------
+            # 3️⃣ Column Formula Validation
+            # -----------------------------
+            elif rule_type == "column_formula_validation":
+                sheet_name = config["sheet"]
+                column_letter = config["column_letter"]
+                start_row = config.get("start_row", 2)
+                required_functions = config.get("required_functions", [])
+                reject_hardcoded = config.get("reject_hardcoded", False)
+
+                if sheet_name in self.workbook.sheetnames:
+                    sheet = self.workbook[sheet_name]
+                    passed = True
+
+                    for row in range(start_row, sheet.max_row + 1):
+                        cell_value = sheet[f"{column_letter}{row}"].value
+
+                        if isinstance(cell_value, str) and cell_value.startswith("="):
+                            formula_upper = cell_value.upper()
+
+                            functions_ok = all(
+                                func.upper() in formula_upper
+                                for func in required_functions
+                            )
+
+                            if not functions_ok:
+                                passed = False
+                                break
+                        else:
+                            if reject_hardcoded:
+                                passed = False
+                                break
                 else:
                     passed = False
 
+            # -----------------------------
+            # Result Builder
+            # -----------------------------
             results.append({
                 "id": check["id"],
                 "section": check["section"],
-                "passed": passed,
-                "marks": check["marks"] if passed else 0,
+                "status": "pass" if passed else "fail",
+                "marks_awarded": check["marks"] if passed else 0,
                 "max_marks": check["marks"]
             })
 
