@@ -9,7 +9,7 @@
       "category": "structure",
       "type": "sheet_exists",
       "config": {
-        "sheet_name": "sheet"
+        "sheet_name": "Summary"
       },
       "marks": 2,
       "section": "Structure"
@@ -20,7 +20,7 @@
       "category": "calculation",
       "type": "cell_formula_validation",
       "config": {
-        "sheet": "sheet",
+        "sheet": "Summary",
         "cell": "B2",
         "required_functions": ["SUM"],
         "reject_hardcoded": true
@@ -34,7 +34,7 @@
       "category": "calculation",
       "type": "column_formula_validation",
       "config": {
-        "sheet": "sheet",
+        "sheet": "Dataset",
         "column_letter": "F",
         "start_row": 2,
         "required_functions": ["IF"],

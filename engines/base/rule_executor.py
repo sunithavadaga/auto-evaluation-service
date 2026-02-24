@@ -17,19 +17,24 @@ class RuleExecutor:
             # 1️⃣ Sheet Exists
             # -----------------------------
             if rule_type == "sheet_exists":
+
                 sheet_name = config.get("sheet") or config.get("sheet_name")
-                passed = sheet_name in self.workbook.sheetnames
+
+                workbook_sheets = [s.strip().lower() for s in self.workbook.sheetnames]
+                passed = sheet_name.strip().lower() in workbook_sheets
 
             # -----------------------------
             # 2️⃣ Cell Formula Validation
             # -----------------------------
             elif rule_type == "cell_formula_validation":
-                sheet_name = config["sheet"]
+
+                sheet_name = config.get("sheet") or config.get("sheet_name")
                 cell_address = config["cell"]
                 required_functions = config.get("required_functions", [])
                 reject_hardcoded = config.get("reject_hardcoded", False)
 
                 if sheet_name in self.workbook.sheetnames:
+
                     sheet = self.workbook[sheet_name]
                     cell_value = sheet[cell_address].value
 
@@ -37,17 +42,12 @@ class RuleExecutor:
 
                         formula_upper = cell_value.upper()
 
-                        # Check required functions
                         functions_ok = all(
                             func.upper() in formula_upper
                             for func in required_functions
                         )
 
-                        # Reject hardcoded values
-                        if reject_hardcoded:
-                            passed = functions_ok
-                        else:
-                            passed = True
+                        passed = functions_ok
                     else:
                         passed = False
 
@@ -55,36 +55,41 @@ class RuleExecutor:
             # 3️⃣ Column Formula Validation
             # -----------------------------
             elif rule_type == "column_formula_validation":
+
                 sheet_name = config["sheet"]
                 column_letter = config["column_letter"]
-                start_row = config.get("start_row", 2)
+                start_row = config["start_row"]
                 required_functions = config.get("required_functions", [])
                 reject_hardcoded = config.get("reject_hardcoded", False)
 
                 if sheet_name in self.workbook.sheetnames:
+
                     sheet = self.workbook[sheet_name]
-                    passed = True
+                    debug_passed = True
 
-                    for row in range(start_row, sheet.max_row + 1):
-                        cell_value = sheet[f"{column_letter}{row}"].value
+                    for r in range(start_row, sheet.max_row + 1):
 
-                        if isinstance(cell_value, str) and cell_value.startswith("="):
-                            formula_upper = cell_value.upper()
+                        cell = sheet[f"{column_letter}{r}"]
 
-                            functions_ok = all(
-                                func.upper() in formula_upper
-                                for func in required_functions
-                            )
+                        if not cell.value:
+                            debug_passed = False
+                            break
 
-                            if not functions_ok:
-                                passed = False
+                        formula = str(cell.value).upper()
+
+                        if not formula.startswith("="):
+                            debug_passed = False
+                            break
+
+                        for func in required_functions:
+                            if func.upper() not in formula:
+                                debug_passed = False
                                 break
-                        else:
-                            if reject_hardcoded:
-                                passed = False
-                                break
-                else:
-                    passed = False
+
+                        if not debug_passed:
+                            break
+
+                    passed = debug_passed
 
             # -----------------------------
             # Result Builder
@@ -94,7 +99,8 @@ class RuleExecutor:
                 "section": check["section"],
                 "status": "pass" if passed else "fail",
                 "marks_awarded": check["marks"] if passed else 0,
-                "max_marks": check["marks"]
+                "max_marks": check["marks"],
+                "debug_passed": passed
             })
 
         return results

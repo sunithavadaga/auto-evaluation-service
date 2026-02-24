@@ -13,7 +13,12 @@ class ExcelEngine:
             data_only=False  # Important: Keep formulas
         )
 
+    '''def evaluate(self):
+        executor = RuleExecutor(self.workbook)
+        results = executor.execute(self.rules["checks"])
+        return results'''
     def evaluate(self):
+        print("Workbook Sheets:", self.workbook.sheetnames)   # 👈 ADD THIS
         executor = RuleExecutor(self.workbook)
         results = executor.execute(self.rules["checks"])
         return results

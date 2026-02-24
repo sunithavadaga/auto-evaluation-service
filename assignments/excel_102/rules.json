@@ -1,0 +1,82 @@
+{
+  "assignment_id": "excel_102",
+  "assignment_type": "excel",
+  "version": "1.0",
+  "checks": [
+
+    {
+      "id": "dataset_sheet_exists",
+      "type": "sheet_exists",
+      "config": {
+        "sheet": "Dataset"
+      },
+      "marks": 2,
+      "section": "Structure"
+    },
+
+    {
+      "id": "summary_sheet_exists",
+      "type": "sheet_exists",
+      "config": {
+        "sheet": "Summary"
+      },
+      "marks": 2,
+      "section": "Structure"
+    },
+
+    {
+      "id": "total_column_formula",
+      "type": "column_formula_validation",
+      "config": {
+        "sheet": "Dataset",
+        "column_letter": "D",
+        "start_row": 2,
+        "required_functions": [],
+        "reject_hardcoded": true
+      },
+      "marks": 4,
+      "section": "Calculations"
+    },
+
+    {
+      "id": "discount_formula_if",
+      "type": "column_formula_validation",
+      "config": {
+        "sheet": "Dataset",
+        "column_letter": "F",
+        "start_row": 2,
+        "required_functions": ["IF"],
+        "reject_hardcoded": true
+      },
+      "marks": 5,
+      "section": "Logical Functions"
+    },
+
+    {
+      "id": "summary_total_sales",
+      "type": "cell_formula_validation",
+      "config": {
+        "sheet": "Summary",
+        "cell": "B2",
+        "required_functions": ["SUM"],
+        "reject_hardcoded": true
+      },
+      "marks": 4,
+      "section": "Summary"
+    },
+
+    {
+      "id": "summary_total_orders",
+      "type": "cell_formula_validation",
+      "config": {
+        "sheet": "Summary",
+        "cell": "B3",
+        "required_functions": ["COUNTA"],
+        "reject_hardcoded": true
+      },
+      "marks": 3,
+      "section": "Summary"
+    }
+
+  ]
+}
