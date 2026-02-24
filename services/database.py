@@ -12,6 +12,9 @@ SessionLocal = sessionmaker(
 
 Base = declarative_base()
 
+from services.models import Submission
+Base.metadata.create_all(bind=engine)
+
 def get_db():
     db = SessionLocal()
     try:

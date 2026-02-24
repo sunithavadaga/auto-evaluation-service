@@ -6,30 +6,26 @@ class RubricEngine:
 
     def generate_report(self):
 
-        section_scores = {}
         total_score = 0
         max_score = 0
+        feedback = []
 
         for result in self.rule_results:
-            section = result["section"]
-            marks_awarded = result["marks_awarded"]
-            max_marks = result["max_marks"]
+            total_score += result["marks_awarded"]
+            max_score += result["max_marks"]
 
-            if section not in section_scores:
-                section_scores[section] = 0
-
-            section_scores[section] += marks_awarded
-            total_score += marks_awarded
-            max_score += max_marks
+            if result["status"] == "fail":
+                feedback.append(f"{result['id']} failed")
 
         percentage = (total_score / max_score) * 100 if max_score > 0 else 0
-        pass_status = percentage >= self.passing_percentage
+
+        final_status = "Pass" if percentage >= self.passing_percentage else "Fail"
 
         return {
-            "section_scores": section_scores,
             "total_score": total_score,
             "max_score": max_score,
             "percentage": round(percentage, 2),
-            "pass": pass_status,
-            "details": self.rule_results
+            "status": final_status,
+            "feedback": feedback,
+            "detailed_results": self.rule_results
         }
